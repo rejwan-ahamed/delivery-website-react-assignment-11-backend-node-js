@@ -74,32 +74,22 @@ async function run() {
       res.send(result);
     });
 
-    // post service api
+    // post service a
     app.post("/products", async (req, res) => {
       const productData = await req.body;
       const result = await productCollections.insertOne(productData);
       res.send(result);
     });
 
-    // get all comment
-    app.get("/comment/", async (req, res) => {
-      const query = { };
-      const sort = { time: -1 };
-      const curser = commentCollection.find(query).sort(sort);
-      const result = await curser.toArray();
-      res.send(result);
-    });
-
-    // get comment my userEmail
-    app.get("/comment/:id", async (req, res) => {
-      const userEmailID = req.params.id;
-      console.log(userEmailID)
-      const query = { email: userEmailID };
-      const sort = { time: -1 };
-      const curser = commentCollection.find(query).sort(sort);
-      const result = await curser.toArray();
-      res.send(result);
-    });
+        // get user comments my product user email
+        app.get("/userComment/:email", async (req, res) => {
+          const UserEmail = req.params.email;
+          const query = { email: UserEmail };
+          const sort = { time: -1 };
+          const curser = commentCollection.find(query).sort(sort);
+          const result = await curser.toArray();
+          res.send(result);
+        });
   } finally {
   }
 }
