@@ -3,7 +3,7 @@ const app = express();
 const cors = require("cors");
 const port = process.env.PORT || 5000;
 require("dotenv").config();
-const { MongoClient, ServerApiVersion } = require("mongodb");
+const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 
 // middle ware
 app.use(cors());
@@ -26,11 +26,42 @@ async function run() {
     const productCollections = client
       .db("User_main")
       .collection("ProductsDetails");
+      const commentCollection = client.db('User_main').collection('userComment')
     // get all products api
     app.get("/products", async (req, res) => {
       const query = {};
-      const curser = productCollections.find(query);
+      const sort = { time: -1 };
+      const curser = productCollections.find(query).sort(sort);
       const result = await curser.toArray();
+      res.send(result);
+    });
+    // product get api limit
+    app.get("/products/limit", async (req, res) => {
+      const query = {};
+      const limit = 3;
+      const sort = { time: -1 };
+      const courser = productCollections.find(query).sort(sort).limit(limit);
+      const result = await courser.toArray();
+      res.send(result);
+    });
+    // get single product
+    app.get("/products/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: ObjectId(id) };
+      const user = await productCollections.findOne(query);
+      res.send(user);
+    });
+    // user comment
+    app.post("/comment", async (req, res) => {
+      const commentData = await req.body;
+      console.log(commentData)
+      const result = await productCollections.insertOne(commentData);
+      res.send(result);
+    });
+    // post service api
+    app.post("/comments", async (req, res) => {
+      const productData = await req.body;
+      const result = await commentCollection.insertOne(productData);
       res.send(result);
     });
   } finally {
