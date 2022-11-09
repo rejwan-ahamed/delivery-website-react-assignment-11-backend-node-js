@@ -26,7 +26,7 @@ async function run() {
     const productCollections = client
       .db("User_main")
       .collection("ProductsDetails");
-      const commentCollection = client.db('User_main').collection('userComment')
+    const commentCollection = client.db("User_main").collection("userComment");
     // get all products api
     app.get("/products", async (req, res) => {
       const query = {};
@@ -51,17 +51,53 @@ async function run() {
       const user = await productCollections.findOne(query);
       res.send(user);
     });
-    // user comment
+    //post user comment
     app.post("/comment", async (req, res) => {
       const commentData = await req.body;
-      console.log(commentData)
+      console.log(commentData);
       const result = await productCollections.insertOne(commentData);
       res.send(result);
     });
-    // post service api
+    // get user comments my product id
+    app.get("/comment/:id", async (req, res) => {
+      const productID = req.params.id;
+      const query = { productID: productID };
+      const sort = { time: -1 };
+      const curser = commentCollection.find(query).sort(sort);
+      const result = await curser.toArray();
+      res.send(result);
+    });
+    // post user comment api
     app.post("/comments", async (req, res) => {
       const productData = await req.body;
       const result = await commentCollection.insertOne(productData);
+      res.send(result);
+    });
+
+    // post service api
+    app.post("/products", async (req, res) => {
+      const productData = await req.body;
+      const result = await productCollections.insertOne(productData);
+      res.send(result);
+    });
+
+    // get all comment
+    app.get("/comment/", async (req, res) => {
+      const query = { };
+      const sort = { time: -1 };
+      const curser = commentCollection.find(query).sort(sort);
+      const result = await curser.toArray();
+      res.send(result);
+    });
+
+    // get comment my userEmail
+    app.get("/comment/:id", async (req, res) => {
+      const userEmailID = req.params.id;
+      console.log(userEmailID)
+      const query = { email: userEmailID };
+      const sort = { time: -1 };
+      const curser = commentCollection.find(query).sort(sort);
+      const result = await curser.toArray();
       res.send(result);
     });
   } finally {
