@@ -81,15 +81,51 @@ async function run() {
       res.send(result);
     });
 
-        // get user comments my product user email
-        app.get("/userComment/:email", async (req, res) => {
-          const UserEmail = req.params.email;
-          const query = { email: UserEmail };
-          const sort = { time: -1 };
-          const curser = commentCollection.find(query).sort(sort);
-          const result = await curser.toArray();
-          res.send(result);
-        });
+    // get user comments my product user email
+    app.get("/userComment/:email", async (req, res) => {
+      const UserEmail = req.params.email;
+      const query = { email: UserEmail };
+      const sort = { time: -1 };
+      const curser = commentCollection.find(query).sort(sort);
+      const result = await curser.toArray();
+      res.send(result);
+    });
+
+    // get user comments id
+    app.get("/userCommentID/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: ObjectId(id) };
+      const curser = commentCollection.find(query);
+      const result = await curser.toArray();
+      res.send(result);
+    });
+
+    // update user
+    app.put("/UserCommentUpdate/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: ObjectId(id) };
+      const userData = req.body;
+      const option = { upsert: true };
+  
+      const updateUser = {
+        $set: {
+          comment: userData.comment,
+          retting: userData.retting,
+        },
+      };
+      console.log(userData)
+      const result = await commentCollection.updateOne(query,updateUser,option)
+      res.send(result)
+    });
+
+     // deleting user data
+     app.delete("/user/comment/delete/:id", async (req, res) => {
+      const userID = req.params.id;
+      const query = { _id: ObjectId(userID) };
+      const deleteUser = await commentCollection.deleteOne(query);
+      res.send(deleteUser);
+    });
+
   } finally {
   }
 }
